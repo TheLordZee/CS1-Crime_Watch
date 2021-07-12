@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% block style %}
+<link rel="stylesheet" href="/static/stylesheets/cover.css">
+{% endblock %}
+
+{% block title %}
+Home
+{% endblock %}
+
+{% block content %}
+<h1 class="display-1">JokeBook</h1>
+
+<h2>Top Joke {% if in_week == True %}of The Week{% else %}of All Time{% endif %}</h2>
+
+<div class="card" id="{{top_joke.id}}">
+    <div class="card-body row">
+        <h5 class="card-title col-10">
+            <button class="btn p-0 mb-1">
+                <i class="far fa-star"></i>
+            </button>
+             {{top_joke.setup}}</h5>
+        <span class="col-1">
+            <button class="btn mr-2 p-0 d-inline" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
+                <i class="fas fa-flag"></i>
+            </button>
+        </span>
+        {% if top_joke.user == g.user %}
+        <span class="col-1">
+            <button class="btn mr-2 p-0 d-inline" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-ellipsis-v"></i>
+            </button>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                <li>
+                    <a class="dropdown-item" href="/jokes/{{top_joke.id}}/edit">Edit Joke</a>
+                </li>
+                <li>
+                    <a class="dropdown-item" href="/jokes/{{top_joke.id}}/delete">Delete Joke</a>
+                </li>
+              </ul>
+        </span>
+        {% endif %}
+        <p class="card-text">{{top_joke.body}}</p>
+        <footer class="blockquote-footer">By    
+            <cite>
+                <a href="/users/{{top_joke.user.id}}" class="card-link">
+                    {{top_joke.user.username}}
+                </a>
+            </cite>
+        </footer>      
+        <p class="mt-3 d-flex">
+            {% if g.user %}
+            <span>
+                <button id="up-rate-btn" class="btn">
+                    <i class="fas fa-plus"></i>
+                </button>
+            </span>
+            {% endif %}
+            <span class="pt-2">{{top_joke.calculate_rating()}}</span>
+            {% if g.user %}
+            <span>
+                <button id="down-rate-btn" class="btn">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </span>
+            {% endif %}
+        </p>
+        <footer class="card-footer">Created: {{top_joke.get_date()}}</footer>
+    </div>
+</div>
+
+{% endblock %}

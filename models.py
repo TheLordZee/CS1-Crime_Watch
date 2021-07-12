@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 
@@ -9,7 +7,7 @@ db = SQLAlchemy()
 class Follows(db.Model):
     """M2M table of followers and followed users"""
 
-    __tablename__ = 'followers'
+    __tablename__ = 'follows'
 
     user_followed_id = db.Column(
         db.Integer,
@@ -57,7 +55,7 @@ class Ratings(db.Model):
     )
 
     rating = db.Column(
-        db.Boolean,
+        db.Integer,
         nullable=False
     )
 
@@ -76,8 +74,8 @@ class Comment(db.Model):
         db.ForeignKey('jokes.id', ondelete="cascade")
     )
 
-    comment = db.Column(
-        db.text,
+    comment_text = db.Column(
+        db.Text,
         nullable=False
     )
 
@@ -103,10 +101,65 @@ class Report(db.Model):
         nullable=False
     )
 
+    reported_at = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
     reason = db.Column(
         db.Text,
         nullable=False
     )
+
+class Joke(db.Model):
+    """Jokes model"""
+
+    __tablename__ = 'jokes'
+    
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"),
+        nullable=False
+    )
+
+    setup = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    body = db.Column(
+        db.Text,
+        nullable=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
+    nsfw = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    def get_date(self):
+        return self.created_at.strftime("%b %d %Y at %I:%M%p")
+
+    user = db.relationship('User')
+
+    rating = db.relationship('Ratings')
+
+    def calculate_rating(self):
+        total_rating = 0
+        for r in self.rating:
+            total_rating = total_rating + r.rating
+
+        return total_rating
 
 class User(db.Model):
     """User Model"""
@@ -145,6 +198,21 @@ class User(db.Model):
         default="/static/images/default-pic.png",
     )
 
+    show_nsfw = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    email_verified = db.Column(
+        db.Boolean,
+        default=False
+    )
+
+    created_at = db.Column(
+        db.DateTime,
+        nullable=False
+    )
+
     jokes = db.relationship('Joke')
 
     followers = db.relationship(
@@ -162,7 +230,7 @@ class User(db.Model):
     )
 
     favorites = db.relationship(
-        'Joke',
+        "Joke",
         secondary="favorites"
     )
 
@@ -184,7 +252,7 @@ class User(db.Model):
         return len(found_user_list) == 1
 
     @classmethod
-    def signup(cls, username, email, password, img_url):
+    def signup(cls, username, email, password, image_url):
         """Sign up user. Hashes password and adds user to system."""
 
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
@@ -193,7 +261,7 @@ class User(db.Model):
             username=username,
             email=email,
             password=hashed_pwd,
-            img_url=img_url
+            image_url=image_url
         )
 
         db.session.add(user)
@@ -213,7 +281,7 @@ class User(db.Model):
         return False
 
 
-class JokeTags(db.model):
+class JokeTags(db.Model):
     """M2M table between tags and jokes"""
 
     __tablename__ = 'joke_tags'
@@ -230,35 +298,6 @@ class JokeTags(db.model):
         primary_key=True
     )
 
-
-class Joke(db.Model):
-    """Jokes model"""
-
-    __tablename__ = 'jokes'
-    
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey('users.id', ondelete="cascade"),
-        nullable=False
-    )
-
-    setup = db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    body = db.Column(
-        db.Text,
-        nullable=False
-    )
-
-    user = db.relationship('User')
-
 class Tag(db.Model):
     """Tag model"""
 
@@ -270,8 +309,20 @@ class Tag(db.Model):
     )
 
     name = db.Column(
-        db.text,
+        db.Text,
         nullable=False
+    )
+
+class Id(db.Model):
+    """Stores the id for the last joke retrieved from the joke api to make sure that the same joke doesn't get called multiple times. No other data should be stored here."""
+
+    id = db.Column( 
+        db.Integer,
+        primary_key=True
+    )
+
+    last_joke_id = db.Column(
+        db.Integer
     )
 
 def connect_db(app):
