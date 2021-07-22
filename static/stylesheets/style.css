@@ -38,3 +38,13 @@
     display: flex;
     justify-content: space-between;
 }
+
+.no-joke-card{
+    width: 50%;
+    background-color: rgb(245, 245, 245);
+}
+
+.no-joke{
+    display: flex;
+    align-items: center;
+}

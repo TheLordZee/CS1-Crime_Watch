@@ -1,6 +1,25 @@
 const $jokeList = $(".jokes-list");
 const BASE_URL = 'http://127.0.0.1:5000/'
 
+async function checkForCurrentUser(){
+    const res = await axios({
+        url: `${BASE_URL}api/check_for_curr_user`,
+        method: "GET"
+    })
+
+    if(res['data']['logged_in_user'] === true){
+        console.log(res)
+        sessionStorage.setItem('curr_user', res['data']['user_id'])
+        return true
+    } else {
+        console.log(res)
+        sessionStorage.removeItem('curr_user')
+        return false
+    }
+}
+
+checkForCurrentUser()
+
 $jokeList.on("click", ".uprate-btn", async function(e){
     rateJoke(e, 1)
 })

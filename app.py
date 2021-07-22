@@ -240,4 +240,40 @@ def update_joke_rating(joke_id):
 @app.route('/api/jokes/random-joke')
 def send_random_joke():
     joke = get_random_joke()
-    return jsonify(joke.serialize())
+    if joke == False:
+        json = {
+            'joke': None
+        }
+    else:
+        json = { 
+           'joke': joke.serialize()
+        }
+    return jsonify(json)
+
+@app.route('/api/current_user')
+def get_curr_user():
+    if g.user:
+        json = {
+            'logged_in': True,
+            'current_user': g.user.serialize()
+        }
+    else:
+        json = {
+            'logged_in': False
+        }
+
+    return jsonify(json)
+
+@app.route('/api/check_for_curr_user')
+def check_for_curr_user():
+    if g.user:
+        json = {
+            'logged_in_user': True,
+            'user_id': g.user.id
+        }      
+    else:
+        json = {
+            'logged_in_user': False
+        }
+
+    return jsonify(json)

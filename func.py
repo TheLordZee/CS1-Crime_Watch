@@ -1,3 +1,4 @@
+from flask.globals import session
 from datetime import datetime, timedelta
 from models import *
 import random
@@ -69,22 +70,26 @@ def rate_joke(user_id, joke_id, rating):
 def get_random_joke():
     ids = []
     user_rated_ids = []
+    if 'prev_joke_id'  not in session:
+        session['prev_joke_id'] = -1
     if g.user:
         for r in g.user.ratings:
             user_rated_ids.append(r.joke_id)
         print(user_rated_ids)
         if g.user.show_nsfw == False:
-            joke_ids = db.session.query(Joke.id).filter(Joke.nsfw == False).all()
+            joke_ids = db.session.query(Joke.id).filter(Joke.nsfw == False, Joke.id != session['prev_joke_id']).all()
         else:
-            joke_ids = db.session.query(Joke.id).all()
+            joke_ids = db.session.query(Joke.id).filter(Joke.id != session['prev_joke_id']).all()
     else:
-        joke_ids = db.session.query(Joke.id).filter(Joke.nsfw == False).all()
+        joke_ids = db.session.query(Joke.id).filter(Joke.nsfw == False, Joke.id != session['prev_joke_id']).all()
     
     for i in joke_ids:
         if i[0] not in user_rated_ids:
             ids.append(i[0])
-
-    print(ids)
+    if len(ids) == 0:
+        return False
     ran_id = random.choice(ids)
+
+    session['prev_joke_id'] = ran_id
     ran_joke = Joke.query.get(ran_id)
     return ran_joke

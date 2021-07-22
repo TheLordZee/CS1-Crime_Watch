@@ -248,6 +248,18 @@ class User(db.Model):
 
     ratings = db.relationship("Ratings")
 
+    def serialize(self):
+        user_json = {
+            'id': self.id,
+            'email': self.email,
+            'username': self.username,
+            'is_admin': self.is_admin,
+            'show_nsfw': self.show_nsfw,
+            'created_at': self.created_at
+        }
+
+        return user_json
+
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
 
