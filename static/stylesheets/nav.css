@@ -123,3 +123,239 @@
     margin-bottom: 1rem;
   }
   
+  .join-message {
+    margin-top: 100px;
+  }
+  
+  #profile-image,
+  #profile-avatar {
+    border-radius: 100%;
+    display: block;
+    margin-left: -15px;
+  }
+  
+  #profile-image {
+    margin: 0 auto 15px;
+    width: 100%;
+  }
+  
+  #profile-avatar {
+    width: 200px;
+    height: 200px;
+    border: 5px solid #fff;
+    margin-top: -120px;
+    z-index: 1;
+    position: relative;
+    box-shadow: 0 1px 1px rgba(136, 153, 166, 0.15);
+  }
+  
+  .timeline-image {
+    border-radius: 48px;
+    height: 48px;
+    width: 48px;
+    margin-top: 2px;
+  }
+  
+  .message-area,
+  .timeline-image {
+    display: inline-block;
+  }
+  
+  .message-area {
+    margin-left: 10px;
+  }
+  
+  #warbler-hero {
+    height: 360px;
+    margin-top: -16px;
+    opacity: 0.7;
+    background-size: cover;
+    background-position: top center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+  }
+  
+  .full-width {
+    width: 100vw;
+    margin: 0 -50vw;
+    position: relative;
+    left: 50%;
+    right: 50%;
+  }
+  
+  .row.full-width {
+    background-color: #fff;
+    margin-top: -80px;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.25);
+    height: 60px;
+    align-items: center;
+  }
+  
+  .user-stats > .ml-auto {
+    display: flex;
+    align-items: center;
+  }
+  
+  .user-stats > .ml-auto .btn {
+    min-width: 105px;
+    padding: 6px 16px;
+  }
+  
+  .stat {
+    text-align: center;
+    height: 60px;
+    box-sizing: border-box;
+    padding: 14px 15px 7px;
+    line-height: 1;
+  }
+  
+  .stat > .small {
+    color: #657786;
+    font-weight: bold;
+    font-size: 12px;
+    letter-spacing: 0.02em;
+    margin-bottom: 0;
+  }
+  
+  .stat > .small + h4 {
+    font-size: 18px;
+    font-weight: bold;
+    padding-top: 3px;
+  }
+  
+  #messages {
+    position: relative;
+  }
+  
+  #messages .message-link {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+  }
+  
+  #messages .list-group-item a:not(.message-link) {
+    position: relative;
+    z-index: 2;
+  }
+  
+  #messages .list-group-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 7px 20px 12px;
+  }
+  
+  #messages:not(.no-hover) .list-group-item:hover {
+    background-color: #e6ecf0;
+  }
+  
+  #sidebar-username {
+    margin-top: 30px;
+    font-size: 21px;
+    font-weight: bold;
+    line-height: 28px;
+    word-wrap: break-word;
+  }
+  
+  @media (max-width: 768px) {
+    .full-width .user-stats .stat {
+      display: none;
+    }
+  }
+  
+  .user-location {
+    color: #657786;
+  }
+  
+  .like{
+    margin: auto;
+    width: 50%;
+  }
+  /* ==================== User cards on follower/following pages */
+  
+  .user-card {
+    width: 100%;
+    padding-bottom: 100%;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    position: relative;
+    background: white;
+    margin-top: 20px;
+  }
+  
+  .user-card > div {
+    position: absolute;
+    background: white;
+  }
+  
+  .user-card form {
+    margin-top: 5px;
+    margin-right: 5px;
+  }
+  
+  .user-card form .btn {
+    min-width: 89px;
+    padding: 4px 12px;
+    font-size: 12px;
+  }
+  
+  .card-hero {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+  }
+  
+  .card-image {
+    border: 3px solid #fff;
+    border-radius: 70px;
+    height: 70px;
+    width: 70px;
+    margin-top: -35px;
+    position: relative;
+    z-index: 1;
+  }
+  
+  .card-link {
+    display: inline-block;
+    margin-left: 10px;
+  }
+  
+  .card-link > p {
+    position: absolute;
+  }
+  
+  .user-cards {
+    margin-bottom: 20px;
+  }
+  
+  .card-inner {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+  }
+  
+  .image-wrapper {
+    width: 100%;
+    padding-bottom: 36%;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card-contents {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  p.card-bio {
+    margin: 2em 10px 0;
+  }

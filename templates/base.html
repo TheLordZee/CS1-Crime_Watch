@@ -7,7 +7,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet"
     href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
-
+    <link rel="stylesheet" href="/static/stylesheets/style.css">
     <link rel="stylesheet" href="/static/stylesheets/nav.css">
     {% block style %}{% endblock %}
     <title>{% block title %}{% endblock %}</title>
@@ -23,29 +23,24 @@
           </div>
           <ul class="nav navbar-nav navbar-right">
             {% if request.endpoint != None %}
-            <li>
-              <form class="navbar-form navbar-right" action="/jokes/search">
-                <input name="q" class="form-control" placeholder="Search JokeBook" id="search">
-                <button class="btn btn-default">
-                  <span class="fa fa-search"></span>
-                </button>
-              </form>
+            <li class="nav-item">
+              <a href="/quick-joke">Quick Joke</a>
             </li>
             <li class="nav-item">
               <a href="/jokes/page/1">Jokes</a>
             </li>
             {% endif %}
-            {% if not g.user %}
-            <li><a href="/signup">Sign up</a></li>
-            <li><a href="/login">Log in</a></li>
-            {% else %}
+            {% if g.user %}
             <li class="nav-item">
-              <button class="nav-link btn p-0" id="userDropDown" data-bs-toggle="dropdown" aria-expanded="false"> 
+              <a href="/users/{{g.user.id}}/favorites">Favorites</a>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link btn p-0" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false"> 
                 <img id="user-img" src="{{ g.user.image_url }}" alt="{{ g.user.username }}">
               </button>
-              <ul id="userDropDown" class="dropdown-menu" aria-labelledby="userDropDown">
+              <ul id="userDropdown" class="dropdown-menu" aria-labelledby="userDropdown">
                 <li>
-                  <a href="/user/{{g.user.id}}">Profile</a>
+                  <a href="/users/{{g.user.id}}/profile">Profile</a>
                 </li>
                 <li>
                   <a href="/jokes/add">Submit Joke</a>
@@ -53,8 +48,14 @@
                 <li>
                   <a href="/logout">Log out</a>
                 </li>
+                <li>
+                  <a href="/users/{{g.user.id}}/settings">Settings</a>
+                </li>
               </ul>
             </li>
+            {% else %}
+            <li><a href="/signup">Sign up</a></li>
+            <li><a href="/login">Log in</a></li>
             {% endif %}
           </ul>
         </div>
@@ -69,6 +70,7 @@
     </div>
 
     <script src="https://unpkg.com/jquery"></script>
+    <script src="https://unpkg.com/axios/dist/axios.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
     <script src="/static/scripts/main.js"></script>
 

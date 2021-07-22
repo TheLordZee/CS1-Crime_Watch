@@ -1,0 +1,40 @@
+.card-link {
+    color: black;
+    text-decoration: none;
+}
+
+.rate-btn {
+    display: flex;
+    width: 4vw;
+    height: 4vw;
+    border: 3px solid black;
+    border-radius: 50%;
+    justify-content: center;
+    align-content: center;
+    flex-wrap: wrap;
+}
+
+#quick-joke{
+    display: flex;
+    justify-content: center;
+}
+
+.quick-card {
+    width: 50%;
+}
+
+.card-header{
+    display: flex;
+    align-items: baseline;
+}
+
+.header-left{
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.left-items{
+    display: flex;
+    justify-content: space-between;
+}

@@ -4,44 +4,56 @@
 
 {% block content %}
 
-<ul class="list-group" id="jokes-list">
+<ul class="list-group jokes-list">
 {% for joke in jokes %}
 <li class="list-group-item"> 
 <div class="card" id="{{joke.id}}">
-    <div class="card-body row">
-        <h5 class="card-title col-10">
+    <div class="card-header row">
+        <div class="header-right col-2">
+            {% if g.user %}
             <button class="btn p-0 mb-1">
                 <i class="far fa-star"></i>
             </button>
-             {{joke.setup}}</h5>
-        <span class="col-1">
-            <button class="btn mr-2 p-0 d-inline" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
-                <i class="fas fa-flag"></i>
-            </button>
-        </span>
-        {% if joke.user == g.user %}
-        <span class="col-1">
-            <button class="btn mr-2 p-0 d-inline" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-ellipsis-v"></i>
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                <li>
-                    <a class="dropdown-item" href="/jokes/{{joke.id}}/edit">Edit Joke</a>
-                </li>
-                <li>
-                    <a class="dropdown-item" href="/jokes/{{joke.id}}/delete">Delete Joke</a>
-                </li>
-              </ul>
-        </span>
-        {% endif %}
+            {% endif %}
+            <a href="/users/{{joke.user.id}}/profile" class="card-link">
+                {{joke.user.username}}
+            </a> 
+        </div>
+        <div class="header-left col-10">
+            <div class="left-items">
+            <span><cite>
+                {{joke.get_date()}}
+            </cite></span>
+            <span class="col-1">
+                <button class="btn mr-1 p-0 d-inline report-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
+                    <i class="fas fa-flag"></i>
+                </button>
+            </span>
+            {% if joke.user == g.user %}
+            <span class="info-btn">
+                <button class="btn mr-2 p-0 d-inline" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li>
+                        <a class="dropdown-item" href="/jokes/{{joke.id}}/edit">Edit Joke</a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="/jokes/{{joke.id}}/delete">Delete Joke</a>
+                    </li>
+                  </ul>
+            </span>
+            {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="card-body row">
+        <h5 class="card-title col-10">
+             {{joke.setup}}
+        </h5>
+        {% if joke.body %}
         <p class="card-text">{{joke.body}}</p>
-        <footer class="blockquote-footer">By    
-            <cite>
-                <a href="/users/{{joke.user.id}}" class="card-link">
-                    {{joke.user.username}}
-                </a>
-            </cite>
-        </footer>      
+        {% endif %}     
         <p class="mt-3 d-flex">
             {% if g.user %}
             <span>
@@ -52,14 +64,14 @@
             {% endif %}
             <span class="pt-2">{{joke.calculate_rating()}}</span>
             {% if g.user %}
-            <span class="downrate-btn">
+            <span>
                 <button class="btn downrate-btn">
                     <i class="fas fa-minus"></i>
                 </button>
             </span>
             {% endif %}
         </p>
-        <footer class="card-footer">Created: {{joke.get_date()}}</footer>
+        
     </div>
 </div>
 </li>

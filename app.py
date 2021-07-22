@@ -1,6 +1,5 @@
 import os
 from flask.globals import session
-
 from flask.helpers import flash
 from forms import *
 from flask import Flask, json, render_template, request, jsonify, redirect, g
@@ -10,6 +9,7 @@ from sqlalchemy.sql import func
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from func import *
+
 
 app = Flask(__name__)
 
@@ -29,7 +29,6 @@ toolbar = DebugToolbarExtension(app)
 connect_db(app)
 
 BASE_URL = 'https://v2.jokeapi.dev/joke/'
-
 
 @app.before_request
 def add_user_to_g():
@@ -58,51 +57,21 @@ def do_logout():
 @app.route("/")
 def homepage():
     """Show homepage."""
-
+    get_random_joke()
     top_joke=''
 
-    if len(Joke.query.order_by(Joke.created_at.desc()).all()) > 0:
-        jokes = db.session.query(
-            Joke, 
-            func.sum(Ratings.rating)
-        ).join(Ratings).group_by(Joke.id).order_by(func.sum(Ratings.rating)).all()
-    
-        for j in jokes:
-            if datetime.now() - j[0].created_at <= timedelta(days=7):
-                print(j[0])
-                top_joke = j[0]
-                return render_template('home.html', top_joke=top_joke, in_week=True)
-       
-        top_joke=jokes[0][0]
-        in_week=False
-                
+    jokes = db.session.query(
+        Joke, 
+        func.sum(Ratings.rating)
+    ).join(Ratings).group_by(Joke.id).order_by(func.sum(Ratings.rating).desc()).all()
 
-    else:
-        if g.user:
-            if g.user.show_nsfw == True:
-                res = requests.get(BASE_URL + 'Any')
-            else:        
-                res = requests.get(BASE_URL + 'Any?safe-mode')
-        else:
-            res = requests.get(BASE_URL + 'Any?safe-mode')
-
-        joke_json = res.json()
-        if joke_json['type'] == 'twopart':
-            top_joke = Joke(
-                user_id=1, 
-                setup=joke_json['setup'],
-                body=joke_json['delivery'],
-                created_at=random_date()
-            )
-            db.session.add(top_joke)
-            db.session.commit()
-            rate_joke(1, top_joke, 1)
+    for j in jokes:
+        if datetime.now() - j[0].created_at <= timedelta(days=7):
+            top_joke = j[0]
+            return render_template('home.html', top_joke=top_joke, in_week=True)
     
-    if datetime.now() - top_joke.created_at <= timedelta(days=7):
-        in_week = True
-    else:
-        in_week = False
-    return render_template('home.html', top_joke=top_joke, in_week=in_week)
+    top_joke=jokes[0][0]
+    return render_template('home.html', top_joke=top_joke, in_week=False)
 ####################################################################################################
 #User signup/login/logout    
 
@@ -118,7 +87,8 @@ def signup():
                 username=form.username.data,
                 password=form.password.data,
                 email=form.email.data,
-                image_url=form.image_url.data or "/static/images/default-pic.png"
+                image_url=form.image_url.data or "/static/images/default-pic.png",
+                created_at=datetime.now()
             )
             db.session.commit()
         except IntegrityError:
@@ -163,6 +133,9 @@ def login():
 
 ####################################################################################################
 #Joke Routes
+@app.route('/quick-joke')
+def show_quick_joke_page():
+    return render_template('jokes/quick-joke.html')
 
 @app.route('/jokes/add', methods=["GET","POST"])
 def add_joke():
@@ -205,6 +178,7 @@ def edit_joke(id):
 @app.route('/jokes/page/<int:page>')
 def put_jokes_on_page(page):
     offset = (page - 1) * 10
+    end = False
     if g.user:
         if g.user.show_nsfw == False:
             jokes = Joke.query.filter(Joke.nsfw == False).order_by(Joke.created_at.desc()).limit(10).offset(offset).all()
@@ -212,45 +186,58 @@ def put_jokes_on_page(page):
             jokes = Joke.query.order_by(Joke.created_at.desc()).limit(10).offset(offset).all()
     else:
         jokes = Joke.query.filter(Joke.nsfw == False).order_by(Joke.created_at.desc()).limit(10).offset(offset).all()
-
+    
     if len(jokes) < 10:
-        """Makes sure """
-        prev_joke = Id.query.get(1)
-        prev_joke_id = prev_joke.last_joke_id
+        end = True
 
-        while len(jokes) < 10:
-            req = requests.get(BASE_URL + f'Any?idRange={prev_joke_id + 1}-{prev_joke_id + 10}&amount=10')
-            prev_joke_id = prev_joke_id + 10
-            jokes_json = req.json()
-            if jokes_json['error'] == True and len(jokes) > 0:
-                return render_template('joke-page.hmtl', jokes=jokes,   end=True)
-            elif jokes_json['error'] == True and len(jokes) == 0:
-                return render_template('404.html')
+    return render_template('jokes/jokes-page.html', jokes=jokes, page=page, end=end)                
 
-            for j in jokes_json['jokes']:
-                if j['type'] == 'twopart':
-                    new_joke = Joke(
-                        user_id=1,
-                        setup=j['setup'],
-                        body=j['delivery'],
-                        created_at=random_date(),
-                        nsfw=not j['safe']
-                    )
-                    db.session.add(new_joke)
+"""User routes"""
+@app.route('/users/<int:user_id>/profile')
+def show_user_profile(user_id):
+    user = User.query.get_or_404(user_id)
+    num_jokes = len(user.jokes)
+    return render_template('users/profile.html', user=user, num_jokes=num_jokes)
+
+"""api routes"""
+@app.route('/api/jokes/<int:joke_id>/rate', methods=['POST'])
+def update_joke_rating(joke_id):
+    if g.user:
+        rating = request.json['rating']
+        if rating == 1 or rating == -1:
+            try:
+                rate_joke(g.user.id, joke_id, rating)
+                json_res = {
+                    "error": False,
+                    "message":"rating added"
+                }
+            
+            except IntegrityError or InvalidRequestError:
+                db.session.rollback()
+                joke_rating = Ratings.query.get((g.user.id, joke_id))
+                if rating != joke_rating.rating:
+                    joke_rating.rating = rating
                     db.session.commit()
-                    if g.user:
-                        if g.user.show_nsfw == False and new_joke.nsfw ==   True:
-                            """does nothing when user doesn't want nsfw and the joke is nsfw"""
-                            print('joke does not go in')
-                        else:
-                            jokes.append(new_joke)
-                    else:
-                        if new_joke.nsfw == False:
-                            """Not logged in users don't get to see nsfw    jokes"""
-                            jokes.append(new_joke)
+                    json_res = {
+                        "error":False,
+                        "message":"rating updated"
+                    }
+                else:
+                    db.session.delete(joke_rating)
+                    db.session.commit()
+                    json_res = {
+                        "error":False,
+                        "message": "rating removed"
+                    }
+        else:
+            print(request.json)
+            json_res = {
+                "error":True,
+                "message": "invalid value"
+            }                       
+        return jsonify(json_res)
 
-        prev_joke.last_joke_id = prev_joke_id
-        db.session.commit()
-
-    return render_template('jokes/jokes-page.html', jokes=jokes, page=page, end=False)                
-
+@app.route('/api/jokes/random-joke')
+def send_random_joke():
+    joke = get_random_joke()
+    return jsonify(joke.serialize())

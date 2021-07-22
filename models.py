@@ -133,8 +133,7 @@ class Joke(db.Model):
     )
 
     body = db.Column(
-        db.Text,
-        nullable=False
+        db.Text
     )
 
     created_at = db.Column(
@@ -146,6 +145,19 @@ class Joke(db.Model):
         db.Boolean,
         default=False
     )
+
+    def serialize(self):
+        joke_json = {
+            'id': self.id,
+            'user_id': self.user_id,
+            'setup': self.setup,
+            'body': self.body,
+            'created_at': self.get_date(),
+            'is_nsfw': self.nsfw,
+            'username': self.user.username
+        }
+
+        return joke_json
 
     def get_date(self):
         return self.created_at.strftime("%b %d %Y at %I:%M%p")
@@ -233,6 +245,8 @@ class User(db.Model):
         "Joke",
         secondary="favorites"
     )
+
+    ratings = db.relationship("Ratings")
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
