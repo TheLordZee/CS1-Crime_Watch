@@ -250,12 +250,12 @@ def send_random_joke():
         }
     return jsonify(json)
 
-@app.route('/api/current_user')
+@app.route('/api/get_curr_user')
 def get_curr_user():
     if g.user:
         json = {
             'logged_in': True,
-            'current_user': g.user.serialize()
+            'curr_user': g.user.serialize()
         }
     else:
         json = {

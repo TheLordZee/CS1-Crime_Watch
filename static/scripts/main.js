@@ -1,15 +1,16 @@
 const $jokeList = $(".jokes-list");
 const BASE_URL = 'http://127.0.0.1:5000/'
 
-async function checkForCurrentUser(){
+async function getCurrUser(){
     const res = await axios({
-        url: `${BASE_URL}api/check_for_curr_user`,
+        url: `${BASE_URL}api/get_curr_user`,
         method: "GET"
     })
 
-    if(res['data']['logged_in_user'] === true){
+    if(res['data']['logged_in'] === true){
         console.log(res)
-        sessionStorage.setItem('curr_user', res['data']['user_id'])
+        const user = new User(res['data']['curr_user'])
+        sessionStorage.setItem('curr_user', JSON.stringify(user))
         return true
     } else {
         console.log(res)
@@ -18,24 +19,29 @@ async function checkForCurrentUser(){
     }
 }
 
-checkForCurrentUser()
+getCurrUser()
 
 $jokeList.on("click", ".uprate-btn", async function(e){
-    rateJoke(e, 1)
-})
-
-$jokeList.on("click", ".downrate-btn", async function(e){
-    rateJoke(e, -1)
-})
-
-async function rateJoke(e, rating){
     let joke_id
     if(e.target.localName === "i"){
         joke_id = e.target.parentElement.parentElement.parentElement.parentElement.parentElement.id
     } else if(e.target.localName === "button"){
         joke_id = e.target.parentElement.parentElement.parentElement.parentElement.id
     }
+    await rateJoke(joke_id, 1).then((res) => {handle_rating_res(e.target, res, 1)})
+})
 
+$jokeList.on("click", ".downrate-btn", async function(e){
+    let joke_id
+    if(e.target.localName === "i"){
+        joke_id = e.target.parentElement.parentElement.parentElement.parentElement.parentElement.id
+    } else if(e.target.localName === "button"){
+        joke_id = e.target.parentElement.parentElement.parentElement.parentElement.id
+    }
+    await rateJoke(joke_id, -1).then((res) => {handle_rating_res(e.target, res, -1)})
+})
+
+async function rateJoke(joke_id, rating){
     const res = await axios({
         url: `${BASE_URL}api/jokes/${joke_id}/rate`,
         method: "POST",
@@ -43,7 +49,7 @@ async function rateJoke(e, rating){
             rating: rating
         }
     })
-    handle_rating_res(e.target, res, rating)
+    return await res
 
 }
 
