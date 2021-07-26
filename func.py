@@ -30,7 +30,7 @@ def get_api_jokes():
             )
             db.session.add(new_joke)
             db.session.commit()
-            print(new_joke)
+            
         elif j['type'] == 'single':
             new_joke = Joke(
                 user_id=1,
@@ -40,6 +40,8 @@ def get_api_jokes():
             )
             db.session.add(new_joke)
             db.session.commit()
+        
+        print(new_joke)
         rate_joke(1, new_joke.id, 1)
     prev_joke.last_joke_id = prev_joke_id
     db.session.commit()

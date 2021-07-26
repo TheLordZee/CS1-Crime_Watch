@@ -25,7 +25,7 @@
 
 .card-header{
     display: flex;
-    align-items: baseline;
+    align-items: center;
 }
 
 .header-left{
@@ -44,7 +44,19 @@
     background-color: rgb(245, 245, 245);
 }
 
+.no-favs-card{
+    background-color: rgb(245, 245, 245);
+}
+
 .no-joke{
     display: flex;
     align-items: center;
+}
+
+#profile-top{
+    height: 40vh;
+    display: flex;
+    align-content: center;
+    align-items: center;
+    justify-content: center;
 }

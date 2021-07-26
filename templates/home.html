@@ -17,7 +17,11 @@ Home
         <div class="header-right col-2">
             {% if g.user %}
             <button class="btn p-0 mb-1">
-                <i class="far fa-star"></i>
+                {% if joke in g.user.favorites %}
+                <i class="fas fa-star" id="{{top_joke.id}}-star"></i>
+                {% else %}
+                <i class="far fa-star" id="{{top_joke.id}}-star"></i>
+                {% endif %}
             </button>
             {% endif %}
             <a href="/users/{{top_joke.user.id}}/profile" class="card-link">
@@ -28,11 +32,12 @@ Home
             <span><cite>
                 {{top_joke.get_date()}}
             </cite></span>
-            {% if top_joke.user == g.user %}
+           
             <span class="col-1">
                 <button class="btn mr-2 p-0 d-inline" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
                     <i class="fas fa-flag"></i>
                 </button>
+                {% if top_joke.user == g.user %}
                 <button class="btn mr-2 p-0 d-inline" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-ellipsis-v"></i>
                 </button>
@@ -44,8 +49,8 @@ Home
                         <a class="dropdown-item" href="/jokes/{{top_joke.id}}/delete">Delete Joke</a>
                     </li>
                   </ul>
+                  {% endif %}
             </span>
-            {% endif %}
         </div>
     </div>
     <div class="card-body row">   

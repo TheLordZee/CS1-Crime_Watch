@@ -1,6 +1,6 @@
 {% extends 'nav-base.html' %}
 {% block body %}
-<ul class="list-group" id="jokes-list">
+<ul class="list-group jokes-list">
     {% if num_jokes == 0 %}
     <li class="list-group-item">
         <div class="card">
@@ -13,13 +13,20 @@
     </li>
     {% endif %}
     {% for joke in user.jokes %}
+    {% if joke.id not in g.user.blocked_jokes %}
     <li class="list-group-item"> 
     <div class="card" id="{{joke.id}}">
         <div class="card-body row">
             <h5 class="card-title col-10">
-                <button class="btn p-0 mb-1">
-                    <i class="far fa-star"></i>
+                {% if user != g.user %}
+                <button class="btn p-0 mb-1 fav-btn">
+                    {% if joke in g.user.favorites %}
+                    <i class="fas fa-star" id="{{joke.id}}-star"></i>
+                    {% else %}
+                    <i class="far fa-star" id="{{joke.id}}-star"></i>
+                    {% endif %}
                 </button>
+                {% endif %}
                  {{joke.setup}}</h5>
             <span class="col-1">
                 <button class="btn mr-2 p-0 d-inline" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
@@ -72,6 +79,7 @@
         </div>
     </div>
     </li>
+    {% endif %}
     {% endfor %}
     </ul>
 {% endblock %}

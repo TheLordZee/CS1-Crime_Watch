@@ -1,11 +1,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <img src="{{ user.image_url }}" alt="Image for {{ user.username }}" id="profile-avatar">
+<div id="profile-top">
+  <img src="{{ user.image_url }}" alt="Image for {{ user.username }}">
+</div>
+  
   <div class="row full-width">
     <div class="container">
       <div class="row justify-content-end">
-        <div class="col-9">
+        
           <ul class="user-stats nav nav-pills">
             <li class="stat">
               <p class="small">Jokes</p>
@@ -26,27 +29,24 @@
               </h4>
             </li>
             <li class="stat">
-              <p class="small">Likes</p>
+              <p class="small">Favoites</p>
               <h4>
-                <a href="/users/{{ user.id }}/likes">{{ user.likes | length }}</a>
+                <a href="/users/{{ user.id }}/favorites">{{ user.favorites | length }}</a>
               </h4>
             </li>
             <div class="ml-auto">
-              {% if g.user.id == user.id %}
-              <a href="/users/{{g.user.id}}/profile/edit" class="btn btn-outline-secondary">Edit Profile</a>
-              <form method="POST" action="/users/delete" class="form-inline">
-                <button class="btn btn-outline-danger ml-2">Delete Profile</button>
-              </form>
-              {% elif g.user %}
+              {% if g.user %}
+              {% if g.user != user %}
               {% if g.user.is_following(user) %}
-              <button id="{{user.id}}" class="btn btn-outline-primary follow-btn">Follow</button>
+              <button id="{{user.id}}" class="btn btn-outline-primary follow-btn">Unfollow</button>
               {% else %}
               <button id="{{user.id}}" class="btn btn-outline-primary follow-btn">Follow</button>
               {% endif %}
               {% endif %}
+              {% endif %}
             </div>
           </ul>
-        </div>
+        
       </div>
     </div>
   </div>

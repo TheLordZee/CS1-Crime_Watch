@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign Up{% endblock %}
-
-{% block body_class %}onboarding{% endblock %}
+{% block title %}User Settings{% endblock %}
 
 {% block content %}
 
   <div class="row justify-content-md-center">
   <div class="col-md-7 col-lg-5">
-    <h2 class="join-message">Join JokeBook today.</h2>
+    <h2 class="join-message"></h2>
     <form method="POST" id="user_form">
       {{ form.hidden_tag() }}
+
       {% for field in form if field.widget.input_type != 'hidden' and field.id != 'show_nsfw' %}
         {% for error in field.errors %}
           <span class="text-danger">{{ error }}</span>
         {% endfor %}
+        {{field.id}}
         {{ field(placeholder=field.label.text, class="form-control") }}
       {% endfor %}
       <div>
@@ -22,7 +22,8 @@
         {{form.show_nsfw}}
       </div>
 
-      <button class="btn btn-primary btn-lg btn-block">Sign me up!</button>
+      <a href="/users/{{u_id}}/profile" class="btn btn-secondary btn-lg btn-block">Cancel</a>
+      <button class="btn btn-primary btn-lg btn-block">Save</button>
     </form>
   </div>
 </div>

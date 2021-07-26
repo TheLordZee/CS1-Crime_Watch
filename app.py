@@ -9,6 +9,7 @@ from sqlalchemy.sql import func
 from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from func import *
+from datetime import datetime, timedelta
 
 
 app = Flask(__name__)
@@ -60,10 +61,16 @@ def homepage():
     get_random_joke()
     top_joke=''
 
-    jokes = db.session.query(
-        Joke, 
-        func.sum(Ratings.rating)
-    ).join(Ratings).group_by(Joke.id).order_by(func.sum(Ratings.rating).desc()).all()
+    if g.user:
+        jokes = db.session.query(
+            Joke, 
+            func.sum(Ratings.rating)
+        ).join(Ratings).group_by(Joke.id).filter(Joke.id not in g.user.blocked_jokes).order_by(func.sum(Ratings.rating).desc()).all()
+    else:
+        jokes = db.session.query(
+            Joke, 
+            func.sum(Ratings.rating)
+        ).join(Ratings).group_by(Joke.id).order_by(func.sum(Ratings.rating).desc()).all()
 
     for j in jokes:
         if datetime.now() - j[0].created_at <= timedelta(days=7):
@@ -88,6 +95,7 @@ def signup():
                 password=form.password.data,
                 email=form.email.data,
                 image_url=form.image_url.data or "/static/images/default-pic.png",
+                show_nsfw=form.show_nsfw.data,
                 created_at=datetime.now()
             )
             db.session.commit()
@@ -192,6 +200,36 @@ def put_jokes_on_page(page):
 
     return render_template('jokes/jokes-page.html', jokes=jokes, page=page, end=end)                
 
+
+@app.route('/jokes/following/page/<int:page>')
+def show_followed_users_jokes(page):
+    offset = (page - 1) * 10
+    end = False
+    if g.user:
+        if g.user.show_nsfw == True:
+            fol_jokes = (db.session
+                    .query(Joke, Follows)
+                    .filter(Follows.user_following_id == g.user.id, Joke.user_id == Follows.user_followed_id)
+                    .order_by(Joke.created_at.desc())
+                    .limit(10)
+                    .offset(offset)
+                    .all())
+        else:
+            fol_jokes = (db.session
+                    .query(Joke, Follows)
+                    .filter(Follows.user_following_id == g.user.id, Joke.user_id == Follows.user_followed_id, Joke.nsfw == False)
+                    .order_by(Joke.created_at.desc())
+                    .limit(10)
+                    .offset(offset)
+                    .all()
+            )
+        
+        jokes = []
+        for j in fol_jokes:
+            jokes.append(j[0])
+
+        return render_template('jokes/followed.html', jokes=jokes, page=page)
+
 """User routes"""
 @app.route('/users/<int:user_id>/profile')
 def show_user_profile(user_id):
@@ -199,7 +237,31 @@ def show_user_profile(user_id):
     num_jokes = len(user.jokes)
     return render_template('users/profile.html', user=user, num_jokes=num_jokes)
 
+@app.route('/users/<int:u_id>/favorites')
+def show_fav_jokes(u_id):
+    user = User.query.get_or_404(u_id)
+    return render_template('jokes/fav-jokes.html', user=user)
+
+@app.route('/users/<int:u_id>/settings', methods=["GET", "POST"])
+def edit_user_settings(u_id):
+    if u_id == g.user.id:
+        form = EditUserForm()
+        if form.validate_on_submit():
+            g.user.username = form.username.data
+            g.user.email = form.email.data 
+            g.user.image_url = form.image_url.data 
+            g.user.show_nsfw = form.show_nsfw.data
+            db.session.commit()
+            return redirect(f'/users/{g.user.id}/profile')
+
+        form.username.data = g.user.username
+        form.email.data = g.user.email
+        form.image_url.data = g.user.image_url
+        form.show_nsfw.data = g.user.show_nsfw
+        return render_template('users/settings.html', form=form, u_id=u_id)
+
 """api routes"""
+
 @app.route('/api/jokes/<int:joke_id>/rate', methods=['POST'])
 def update_joke_rating(joke_id):
     if g.user:
@@ -277,3 +339,82 @@ def check_for_curr_user():
         }
 
     return jsonify(json)
+
+@app.route('/api/jokes/favorite', methods=["POST"])
+def favorite_joke():
+    if g.user:
+        joke_id = request.json['joke_id']
+        if Favorites.query.get((g.user.id, joke_id)):
+            fav = Favorites.query.get((g.user.id, joke_id))
+            db.session.delete(fav)
+            db.session.commit()
+            json = {
+                'error': False,
+                'message': 'Favorite removed'
+            }
+        else:
+            favorite = Favorites(user_id=g.user.id, joke_id=joke_id)
+            db.session.add(favorite)
+            db.session.commit()
+            json = {
+                'error': False,
+                'message': 'Joke favorited'
+            }
+        return jsonify(json)
+
+@app.route('/api/users/follow', methods=['POST'])
+def follow_user():
+    if g.user:
+        user_id = request.json['u_id']
+        user = User.query.get(user_id)
+        if g.user.is_following(user):
+            follow = Follows.query.get((user_id, g.user.id))
+            db.session.delete(follow)
+            db.session.commit()
+            json = {
+                'error': False,
+                'type': 'unfollow',
+                'message': f'{g.user.username} unfollowed {user.username}'
+            }
+        else:
+            g.user.following.append(user)
+            db.session.commit()
+            json = {
+                'error': False,
+                'type': 'follow',
+                'message': f'{g.user.username} followed {user.username}'
+            }
+
+        return jsonify(json)
+
+@app.route('/api/report_joke', methods=["POST"])
+def report_joke():
+    if g.user:
+        joke_id = request.json['joke_id']
+        reason = request.json['reason']
+        if not Report.query.get((g.user.id, joke_id)):
+            report = Report(
+                reporter_id=g.user.id,
+                joke_id=joke_id,
+                reported_at=datetime.now(),
+                reason=reason
+            )
+            
+            blocked_jokes = g.user.blocked_jokes.copy()
+            blocked_jokes.append(joke_id)
+            g.user.blocked_jokes = blocked_jokes
+
+            db.session.add(report)
+            db.session.commit()
+
+            json = {
+                "error": False,
+                "message": "joke reported"
+            }
+        else:
+            json = {
+                "error": True,
+                "message": "you can't report the same joke more than once"
+            }
+        print(g.user.blocked_jokes)
+        return jsonify(json)

@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, TextAreaField
+from wtforms import StringField, PasswordField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired, Length, Optional, EqualTo, InputRequired
 from wtforms.widgets import TextArea
 from wtforms.fields.html5 import EmailField
@@ -12,6 +12,14 @@ class SignUpForm(FlaskForm):
     password = PasswordField('Password', validators=[Length(min=6), EqualTo('confirm')])
     confirm = PasswordField('Repeat Password', validators=[Length(min=6)])
     image_url = StringField('(Optional) Image URL')
+    show_nsfw = BooleanField('Show nsfw jokes')
+
+class EditUserForm(FlaskForm):
+    """Form for editing a user"""
+    username = StringField('Username', validators=[InputRequired()])
+    email = EmailField('E-mail', validators=[InputRequired()])
+    image_url = StringField('(Optional) Image URL')
+    show_nsfw = BooleanField('Show nsfw jokes')
 
 class LoginForm(FlaskForm):
     """Login form."""

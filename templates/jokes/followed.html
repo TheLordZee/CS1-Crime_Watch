@@ -1,12 +1,13 @@
 {% extends 'base.html' %}
 
-{% block title %}Jokes{% endblock %}
+{% block title %}Followed Jokes{% endblock %}
 
 {% block content %}
 
+
 <ul class="list-group jokes-list">
+{% if jokes | length > 0 %}
 {% for joke in jokes %}
-{% if joke.id not in g.user.blocked_jokes %}
 <li class="list-group-item"> 
 <div class="card" id="{{joke.id}}">
     <div class="card-header row">
@@ -30,20 +31,9 @@
                 {{joke.get_date()}}
             </cite></span>
             <span class="col-1">
-                <button class="btn mr-1 p-0 d-inline report" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                <button class="btn mr-1 p-0 d-inline report-btn" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
                     <i class="fas fa-flag"></i>
                 </button>
-                <ul class="dropdown-menu report-list" id="{{joke.id}}-report" aria-labelledby="dropdownMenuButton2">
-                    <li>
-                        <button class="naj dropdown-item report-btn">Not A Joke</button>
-                    </li>
-                    <li>
-                        <button class="spam dropdown-item report-btn">Spam</button>
-                    </li>
-                    <li>
-                        <button class="other dropdown-item report-btn">Other</button>
-                    </li>
-                </ul>
             </span>
             {% if joke.user == g.user %}
             <span class="info-btn">
@@ -91,10 +81,25 @@
     </div>
 </div>
 </li>
-{% endif %}
 {% endfor %}
+{% else %}
+<div class="card no-favs-card">
+    <div class="card-body no-joke">
+        <h5 class="card-title text-center">
+            {% if g.user.follows %}
+            Looks like the users you follow haven't posted anything yet. 
+            Come back later and see if they do.
+            {% else %}
+            Looks like you haven't followed anyone yet.
+            Come back when you have and their jokes will appear here.
+            {% endif %}
+       </h5>
+    </div>
+</div>
+{% endif %}
 </ul>
 
+{% if jokes %}
 <div class="d-flex justify-content-center">
 {% if page > 1 %}
 <span class="me-5"><a href="/jokes/page/{{page - 1}}"><i class="fas fa-chevron-left"></i></a></span>
@@ -104,4 +109,5 @@
 <span class="ms-5"><a href="/jokes/page/{{page + 1}}"><i class="fas fa-chevron-right"></i></a></span>
 {% endif %}
 </div>
+{% endif %}
 {% endblock %}

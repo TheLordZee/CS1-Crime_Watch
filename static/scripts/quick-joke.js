@@ -44,14 +44,14 @@ function generateJokeHtml(joke){
     if(sessionStorage.getItem('curr_user')){
         const favBtn= `
                     <button class="btn p-0 mb-1">
-                        <i class="far fa-star"></i>
+                        <i class="far fa-star fav-btn" id="${joke.id}-star"></i>
                     </button>
                 `
         html = html + favBtn
     }
     html = html + `<a href="/users/${joke.user_id}/profile" class="card-link">${joke.username}</a>
                 </div>
-                <div class="header-left d-flex flex-row justify-content-end col-8">
+                <div class="header-left col-8">
                     <span class="p-2">
                         <cite>${joke.created_at}</cite>
                     </span>

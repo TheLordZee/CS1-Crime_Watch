@@ -83,22 +83,19 @@ class Report(db.Model):
     """Report model"""
 
     __tablename__ = 'reports'
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
     
     reporter_id = db.Column(
         db.Integer,
         db.ForeignKey('users.id', ondelete="cascade"),
-        nullable=False
+        nullable=False,
+        primary_key=True
     )
 
     joke_id = db.Column(
         db.Integer,
         db.ForeignKey('jokes.id', ondelete="cascade"),
-        nullable=False
+        nullable=False,
+        primary_key=True
     )
 
     reported_at = db.Column(
@@ -225,6 +222,11 @@ class User(db.Model):
         nullable=False
     )
 
+    blocked_jokes = db.Column(
+        db.ARRAY(db.Integer),
+        default=[]
+    )
+
     jokes = db.relationship('Joke')
 
     followers = db.relationship(
@@ -278,7 +280,7 @@ class User(db.Model):
         return len(found_user_list) == 1
 
     @classmethod
-    def signup(cls, username, email, password, image_url):
+    def signup(cls, username, email, password, image_url, show_nsfw, created_at):
         """Sign up user. Hashes password and adds user to system."""
 
         hashed_pwd = bcrypt.generate_password_hash(password).decode('UTF-8')
@@ -287,7 +289,9 @@ class User(db.Model):
             username=username,
             email=email,
             password=hashed_pwd,
-            image_url=image_url
+            image_url=image_url,
+            show_nsfw=show_nsfw,
+            created_at=created_at
         )
 
         db.session.add(user)
