@@ -40,6 +40,18 @@ $reportList.on("click", ".report-btn", async function(e){
     const reason = e.target.classList[0]
     const res = await reportJoke(joke_id, reason)
     if(res.data.error === false){
-        console.log(e)
+        e.target.parentElement.parentElement.parentElement.offsetParent.innerHTML = `
+            <h4 class="text-center">Joke reported</h4>
+        `
+    }
+})
+
+$jokeList.on("click", ".delete-btn", async function(e){
+    const joke_id = parseInt(e.target.parentElement.parentElement.offsetParent.id)
+    const res = await deleteJoke(joke_id)
+    if(res.data.error === false){
+        e.target.parentElement.parentElement.parentElement.offsetParent.innerHTML = `
+            <h4 class="text-center">Joke deleted</h4>
+        `
     }
 })

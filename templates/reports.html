@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Jokes{% endblock %}
+
+{% block content %}
+<ul class="list-group jokes-list">
+{% for joke in reports %}
+<li class="list-group-item"> 
+<div class="card" id="{{joke[0].id}}">
+    <div class="card-header">
+        <h4>Joke was reported {{joke[1]}} times</h4>
+    </div>
+    <div class="card-header row">
+        <div class="header-right col-4">
+            <a href="/users/{{joke[0].user.id}}/profile" class="card-link">
+                {{joke[0].user.username}}
+            </a> 
+        </div>
+        <div class="header-left col-8">
+            <div class="left-items">
+            <span><cite>
+                {{joke[0].get_date()}}
+            </cite></span>
+            <span class="info-btn">
+                <button class="btn mr-2 p-0 d-inline" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-ellipsis-v"></i>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                    <li>
+                        <button class="cancel-btn dropdown-item">Cancel Report</button>
+                    </li>
+                    <li>
+                        <button class="delete-btn dropdown-item">Delete Joke</button>
+                    </li>
+                  </ul>
+            </span>
+            </div>
+        </div>
+    </div>
+    <div class="card-body row">
+        <h5 class="card-title col-10">
+             {{joke[0].setup}}
+        </h5>
+        {% if joke[0].body %}
+        <p class="card-text">{{joke[0].body}}</p>
+        {% endif %}     
+        <p class="mt-3 d-flex">
+            <span class="pt-2">{{joke[0].calculate_rating()}}</span>
+        </p>       
+    </div>
+</div>
+</li>
+{% endfor %}
+</ul>
+{% endblock %}

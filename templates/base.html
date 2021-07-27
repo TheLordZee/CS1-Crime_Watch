@@ -34,6 +34,11 @@
             <li class="nav-item">
               <a href="/jokes/following/page/1">Followed Jokes</a>
             </li>
+            {% if g.user.is_admin %}
+            <li class="nav-item">
+              <a href="/reports">Reports</a>
+            </li>
+            {% endif %}
             <li class="nav-item">
               <button class="nav-link btn p-0" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false"> 
                 <img id="user-img" src="{{ g.user.image_url }}" alt="{{ g.user.username }}">

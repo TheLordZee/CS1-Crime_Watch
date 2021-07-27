@@ -59,26 +59,6 @@ class Ratings(db.Model):
         nullable=False
     )
 
-class Comment(db.Model):
-    """Comment model"""
-
-    __tablename__ = 'comments'
-
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-
-    joke_id = db.Column(
-        db.Integer,
-        db.ForeignKey('jokes.id', ondelete="cascade")
-    )
-
-    comment_text = db.Column(
-        db.Text,
-        nullable=False
-    )
-
 class Report(db.Model):
     """Report model"""
 
@@ -142,6 +122,11 @@ class Joke(db.Model):
         db.Boolean,
         default=False
     )
+
+    reports = db.relationship('Report')
+    user = db.relationship('User')
+    rating = db.relationship('Ratings')
+
 
     def serialize(self):
         joke_json = {

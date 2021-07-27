@@ -228,7 +228,10 @@ def show_followed_users_jokes(page):
         for j in fol_jokes:
             jokes.append(j[0])
 
-        return render_template('jokes/followed.html', jokes=jokes, page=page)
+        if len(jokes) < 10:
+            end = True
+
+        return render_template('jokes/followed.html', jokes=jokes, page=page, end=end)
 
 """User routes"""
 @app.route('/users/<int:user_id>/profile')
@@ -259,12 +262,29 @@ def edit_user_settings(u_id):
         form.image_url.data = g.user.image_url
         form.show_nsfw.data = g.user.show_nsfw
         return render_template('users/settings.html', form=form, u_id=u_id)
+    
+    return redirect('/')
+
+"""report route"""
+
+@app.route('/reports')
+def show_reports():
+    if g.user:
+        if g.user.is_admin:
+            reports = db.session.query(
+                Joke, 
+                func.count(Report.joke_id)
+            ).join(Report).group_by(Joke.id).order_by(func.count(Report.joke_id).desc()).all()
+            return render_template('reports.html', reports=reports)
+    
+    return redirect('/')
 
 """api routes"""
 
-@app.route('/api/jokes/<int:joke_id>/rate', methods=['POST'])
+@app.route('/api/jokes/rate', methods=['POST'])
 def update_joke_rating(joke_id):
     if g.user:
+        joke_id = request.json['joke_id']
         rating = request.json['rating']
         if rating == 1 or rating == -1:
             try:
@@ -362,6 +382,36 @@ def favorite_joke():
             }
         return jsonify(json)
 
+@app.route('/api/jokes/delete', methods=["DELETE"])
+def delete_joke():
+    if g.user:
+        joke_id = request.json['joke_id']
+        joke = Joke.query.get(joke_id)
+        if joke.user == g.user or g.user.is_admin:
+            for report in joke.reports:
+                db.session.delete(report)
+            for rating in joke.rating:
+                db.session.delete(rating)
+
+            db.session.delete(joke)
+            db.session.commit()
+            json = {
+                'error': False,
+                'message':'joke deleted'
+            }
+        else:
+            json = {
+                'error': True,
+                'message': "you aren't allowed to delete this joke"
+            }
+    else:
+        json = {
+            'error': True,
+            'message': "you aren't allowed to delete this joke"
+        }
+
+    return jsonify(json)
+
 @app.route('/api/users/follow', methods=['POST'])
 def follow_user():
     if g.user:
@@ -387,7 +437,7 @@ def follow_user():
 
         return jsonify(json)
 
-@app.route('/api/report_joke', methods=["POST"])
+@app.route('/api/report', methods=["POST"])
 def report_joke():
     if g.user:
         joke_id = request.json['joke_id']
@@ -418,3 +468,30 @@ def report_joke():
             }
         print(g.user.blocked_jokes)
         return jsonify(json)
+
+@app.route('/api/report/cancel')
+def cancel_report():
+    if g.user:
+        if g.user.is_admin:
+            joke_id = request.json['joke_id']
+            reports = db.session.query(Report).filter(Report.joke_id == joke_id).all()
+            for report in reports:
+                db.session.delete(report)
+
+            db.session.commit()
+            json = {
+                'error': False,
+                'message': 'report canceled'
+            }
+        else:
+            json = {
+                'error': True,
+                'message': 'only admins can cancel reports'
+            }
+    else:
+            json = {
+                'error': True,
+                'message': 'only admins can cancel reports'
+            }
+
+    return jsonify(json)

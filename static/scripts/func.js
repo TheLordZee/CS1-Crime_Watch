@@ -32,7 +32,19 @@ async function rateJoke(joke_id, rating){
         url: `${BASE_URL}api/jokes/${joke_id}/rate`,
         method: "POST",
         data: {
+            joke_id:joke_id,
             rating: rating
+        }
+    })
+    return res
+}
+
+async function deleteJoke(joke_id){
+    const res = await axios({
+        url: `${BASE_URL}api/jokes/delete`,
+        method: "DELETE",
+        data: {
+            joke_id: joke_id
         }
     })
     return res
