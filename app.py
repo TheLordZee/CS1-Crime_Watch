@@ -18,6 +18,8 @@ CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)
 
+
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '*&H-H*-87hup978hnuh98j')
 app.config['SQLALCHEMY_DATABASE_URI'] = (
     os.environ.get('DATABASE_URL', 'postgres:///jokebook_db'))
 
