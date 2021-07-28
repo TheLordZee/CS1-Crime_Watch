@@ -29,9 +29,20 @@
                 {% endif %}
                  {{joke.setup}}</h5>
             <span class="col-1">
-                <button class="btn mr-2 p-0 d-inline" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
+                <button class="btn mr-1 p-0 d-inline report" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-flag"></i>
                 </button>
+                <ul class="dropdown-menu report-list" id="{{joke.id}}-report" aria-labelledby="dropdownMenuButton2">
+                    <li>
+                        <button class="naj dropdown-item report-btn">Not A Joke</button>
+                    </li>
+                    <li>
+                        <button class="spam dropdown-item report-btn">Spam</button>
+                    </li>
+                    <li>
+                        <button class="other dropdown-item report-btn">Other</button>
+                    </li>
+                </ul>
             </span>
             {% if joke.user == g.user %}
             <span class="col-1">
@@ -43,7 +54,7 @@
                         <a class="dropdown-item" href="/jokes/{{joke.id}}/edit">Edit Joke</a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="/jokes/{{joke.id}}/delete">Delete Joke</a>
+                        <button class="delete-btn dropdown-item">Delete Joke</button>
                     </li>
                   </ul>
             </span>

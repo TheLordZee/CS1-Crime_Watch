@@ -56,9 +56,20 @@ function generateJokeHtml(joke){
                         <cite>${joke.created_at}</cite>
                     </span>
                     <span class="p-2">
-                        <button class="btn mr-2 p-0 d-inline"   data-bs-toggle="tooltip"  data-bs-placement="top"     title="Report User">
-                            <i class="fas fa-flag"></i>
-                        </button>
+                    <button class="btn mr-1 p-0 d-inline report" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="fas fa-flag"></i>
+                    </button>
+                    <ul class="dropdown-menu report-list" id="${joke.id}-report"    aria-labelledby="dropdownMenuButton2">
+                        <li>
+                            <button class="naj dropdown-item report-btn">Not A Joke</   button>
+                        </li>
+                        <li>
+                            <button class="spam dropdown-item report-btn">Spam</button>
+                        </li>
+                        <li>
+                            <button class="other dropdown-item report-btn">Other</  button>
+                        </li>
+                    </ul>
                     </span>`
     if(sessionStorage.getItem('curr_user')){
         if(joke.user_id === JSON.parse(sessionStorage.getItem('curr_user')).id){

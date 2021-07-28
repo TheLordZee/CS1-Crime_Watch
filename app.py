@@ -282,20 +282,12 @@ def show_reports():
 """api routes"""
 
 @app.route('/api/jokes/rate', methods=['POST'])
-def update_joke_rating(joke_id):
+def update_joke_rating():
     if g.user:
         joke_id = request.json['joke_id']
         rating = request.json['rating']
         if rating == 1 or rating == -1:
-            try:
-                rate_joke(g.user.id, joke_id, rating)
-                json_res = {
-                    "error": False,
-                    "message":"rating added"
-                }
-            
-            except IntegrityError or InvalidRequestError:
-                db.session.rollback()
+            if  Ratings.query.get((g.user.id, joke_id)):
                 joke_rating = Ratings.query.get((g.user.id, joke_id))
                 if rating != joke_rating.rating:
                     joke_rating.rating = rating
@@ -311,6 +303,12 @@ def update_joke_rating(joke_id):
                         "error":False,
                         "message": "rating removed"
                     }
+            else:
+                rate_joke(g.user.id, joke_id, rating)
+                json_res = {
+                    "error": False,
+                    "message":"rating added"
+                }
         else:
             print(request.json)
             json_res = {
@@ -390,8 +388,10 @@ def delete_joke():
         if joke.user == g.user or g.user.is_admin:
             for report in joke.reports:
                 db.session.delete(report)
+                db.session.commit()
             for rating in joke.rating:
                 db.session.delete(rating)
+                db.session.commit()
 
             db.session.delete(joke)
             db.session.commit()
@@ -469,7 +469,7 @@ def report_joke():
         print(g.user.blocked_jokes)
         return jsonify(json)
 
-@app.route('/api/report/cancel')
+@app.route('/api/report/cancel', methods=["DELETE"])
 def cancel_report():
     if g.user:
         if g.user.is_admin:

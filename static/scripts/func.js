@@ -29,10 +29,10 @@ async function followUser(u_id){
 
 async function rateJoke(joke_id, rating){
     const res = await axios({
-        url: `${BASE_URL}api/jokes/${joke_id}/rate`,
+        url: `${BASE_URL}api/jokes/rate`,
         method: "POST",
         data: {
-            joke_id:joke_id,
+            joke_id: joke_id,
             rating: rating
         }
     })
@@ -63,7 +63,7 @@ async function favJoke(joke_id){
 
 async function reportJoke(joke_id, reason){
     const res = await axios({
-        url: `${BASE_URL}api/report_joke`,
+        url: `${BASE_URL}api/report`,
         method: "POST",
         data: {
             joke_id: joke_id,
@@ -71,6 +71,17 @@ async function reportJoke(joke_id, reason){
         }
     })
     return res
+}
+
+async function cancelReport(joke_id){
+    const res = await axios({
+        url: `${BASE_URL}api/report/cancel`,
+        method: "DELETE",
+        data: {
+            joke_id: joke_id,
+        }
+    })
+    return res  
 }
 
 function handle_rating_res(target, json, rating){

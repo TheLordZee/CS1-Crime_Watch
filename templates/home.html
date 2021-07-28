@@ -16,8 +16,8 @@ Home
     <div class="card-header row">
         <div class="header-right col-2">
             {% if g.user %}
-            <button class="btn p-0 mb-1">
-                {% if joke in g.user.favorites %}
+            <button class="btn p-0 mb-1 fav-btn">
+                {% if top_joke in g.user.favorites %}
                 <i class="fas fa-star" id="{{top_joke.id}}-star"></i>
                 {% else %}
                 <i class="far fa-star" id="{{top_joke.id}}-star"></i>
@@ -34,9 +34,20 @@ Home
             </cite></span>
            
             <span class="col-1">
-                <button class="btn mr-2 p-0 d-inline" data-bs-toggle="tooltip" data-bs-placement="top" title="Report User">
+                <button class="btn mr-1 p-0 d-inline report" type="button" id="dropdownMenuButton2" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-flag"></i>
                 </button>
+                <ul class="dropdown-menu report-list" id="{{top_joke.id}}-report" aria-labelledby="dropdownMenuButton2">
+                    <li>
+                        <button class="naj dropdown-item report-btn">Not A Joke</button>
+                    </li>
+                    <li>
+                        <button class="spam dropdown-item report-btn">Spam</button>
+                    </li>
+                    <li>
+                        <button class="other dropdown-item report-btn">Other</button>
+                    </li>
+                </ul>
                 {% if top_joke.user == g.user %}
                 <button class="btn mr-2 p-0 d-inline" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="fas fa-ellipsis-v"></i>
@@ -46,7 +57,7 @@ Home
                         <a class="dropdown-item" href="/jokes/{{top_joke.id}}/edit">Edit Joke</a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="/jokes/{{top_joke.id}}/delete">Delete Joke</a>
+                        <button class="delete-btn dropdown-item">Delete Joke</button>
                     </li>
                   </ul>
                   {% endif %}

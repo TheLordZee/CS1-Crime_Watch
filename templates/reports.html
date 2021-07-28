@@ -4,6 +4,15 @@
 
 {% block content %}
 <ul class="list-group jokes-list">
+{% if not reports %}
+<div class="card no-favs-card">
+    <div class="card-body no-joke">
+        <h5 class="card-title text-center">
+            All reports have been taken care of.
+       </h5>
+    </div>
+</div>
+{% else %}
 {% for joke in reports %}
 <li class="list-group-item"> 
 <div class="card" id="{{joke[0].id}}">
@@ -51,5 +60,6 @@
 </div>
 </li>
 {% endfor %}
+{% endif %}
 </ul>
 {% endblock %}

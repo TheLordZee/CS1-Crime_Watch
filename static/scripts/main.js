@@ -55,3 +55,13 @@ $jokeList.on("click", ".delete-btn", async function(e){
         `
     }
 })
+
+$jokeList.on("click", ".cancel-btn", async function(e){
+    const joke_id = parseInt(e.target.parentElement.parentElement.offsetParent.id)
+    const res = await cancelReport(joke_id)
+    if(res.data.error === false){
+        e.target.parentElement.parentElement.parentElement.offsetParent.innerHTML = `
+            <h4 class="text-center">Report Cancelled</h4>
+        `
+    }
+})
