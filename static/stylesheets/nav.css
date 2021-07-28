@@ -267,16 +267,6 @@
     word-wrap: break-word;
   }
   
-  @media (max-width: 768px) {
-    .full-width .user-stats .stat {
-      display: none;
-    }
-  }
-  
-  .user-location {
-    color: #657786;
-  }
-  
   .like{
     margin: auto;
     width: 50%;

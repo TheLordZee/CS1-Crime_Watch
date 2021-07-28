@@ -60,3 +60,20 @@
     align-items: center;
     justify-content: center;
 }
+
+#user-dropdown{
+    display: flex;
+    justify-content: flex-end;
+}
+
+#user-dropdown li a {
+    color: white;
+}
+
+.nav li a {
+    color:  white;
+}
+
+.jokes-list {
+    margin-top: 10%;
+}
