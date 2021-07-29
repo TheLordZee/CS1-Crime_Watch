@@ -85,6 +85,7 @@ async function cancelReport(joke_id){
 }
 
 function handle_rating_res(target, json, rating){
+    console.log(json)
     if(json["error"] === true){
         return json["message"]
     } 

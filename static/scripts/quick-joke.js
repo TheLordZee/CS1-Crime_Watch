@@ -24,6 +24,7 @@ async function getRandomJoke(){
 
 function handleJokeRes(res){
     let html;
+    console.log(res)
     if(res['data']['joke']){
         if(!res['data']['joke']['body']){
            res['data']['joke']['body'] = ''
