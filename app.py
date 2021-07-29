@@ -10,17 +10,18 @@ from flask_debugtoolbar import DebugToolbarExtension
 import requests
 from func import *
 from datetime import datetime, timedelta
-from pml import app 
+
 
 app = Flask(__name__)
 
 CURR_USER_KEY = "curr_user"
 
-port = int(os.environ.get('PORT', 5000)) 
-app.run(host='0.0.0.0', port=port)
+app = Flask(__name__)
+
+
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', '*&H-H*-87hup978hnuh98j')
 app.config['SQLALCHEMY_DATABASE_URI'] = (
-    os.environ.get('DATABASE_URL', 'postgresql:///jokebook_db'))
+    os.environ.get('DATABASE_URL', 'postgres:///jokebook_db'))
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = False
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
