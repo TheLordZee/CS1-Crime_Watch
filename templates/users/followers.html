@@ -3,28 +3,26 @@
 {% block title %}Followers{% endblock %}
 
 {% block content %}
-
-{% for f in user.followers %}
-
-    <div class="col-lg-4 col-md-6 col-12">
-        <div class="card user-card">
-          <div class="card-inner">
-            <div class="card-contents">
-              <a href="/users/{{ follower.id }}/profile" class="card-link">
-                <img src="{{ follower.image_url }}" alt="Image for {{ follower.username }}" class="card-image">
-                <p>{{ follower.username }}</p>
-              </a>
-              {% if g.user.is_following(follower) %}
-                  <button class="btn btn-primary btn-sm unfollow-btn">Unfollow</button>
-              {% else %}
-                  <button class="btn btn-outline-primary btn-sm follow-btn">Follow</button>
-              {% endif %}
-
-            </div>
-          </div>
-        </div>
-      </div>
-
+<h1>Followers:</h1>
+{% for follower in user.followers %}
+<div class="card user-card">
+  <a href="/users/{{follower.id}}/profile">
+    <img src="{{follower.image_url}}" class="card-img-top" alt="...">
+  </a>
+  <div class="card-body">
+    <h5 class="card-title">{{follower.username}}</h5>
+    <a class="btn btn-primary" href="/users/{{follower.id}}/profile">Profile</a>
+    {% if g.user %}
+    {% if g.user != follower %}
+    {% if g.user.is_following(user) %}
+    <button id="{{follower.id}}" class="btn btn-outline-primary follow-btn">Unfollow</button>
+    {% else %}
+    <button id="{{follower.id}}" class="btn btn-outline-primary follow-btn">Follow</button>
+    {% endif %}
+    {% endif %}
+    {% endif %}
+  </div>
+</div>
 {% endfor %}
 
 {% endblock %}

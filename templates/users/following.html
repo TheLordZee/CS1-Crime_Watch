@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Following{% endblock %}
+
+{% block content %}
+<h1>Following:</h1>
+{% for follow in user.following %}
+<div class="card user-card">
+    <a href="/users/{{follow.id}}/profile">
+      <img src="{{follow.image_url}}" class="card-img-top" alt="...">
+    </a>
+    <div class="card-body">
+      <h5 class="card-title">{{follow.username}}</h5>
+      <a class="btn btn-primary" href="/users/{{follow.id}}/profile">Profile</a>
+      {% if g.user %}
+      {% if g.user != follow %}
+      {% if g.user.is_following(user) %}
+      <button id="{{follow.id}}" class="btn btn-outline-primary follow-btn">Unfollow</button>
+      {% else %}
+      <button id="{{follow.id}}" class="btn btn-outline-primary follow-btn">Follow</button>
+      {% endif %}
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+{% endfor %}
+
+{% endblock %}

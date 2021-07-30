@@ -273,32 +273,6 @@
   }
   /* ==================== User cards on follower/following pages */
   
-  .user-card {
-    width: 100%;
-    padding-bottom: 100%;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    position: relative;
-    background: white;
-    margin-top: 20px;
-  }
-  
-  .user-card > div {
-    position: absolute;
-    background: white;
-  }
-  
-  .user-card form {
-    margin-top: 5px;
-    margin-right: 5px;
-  }
-  
-  .user-card form .btn {
-    min-width: 89px;
-    padding: 4px 12px;
-    font-size: 12px;
-  }
-  
   .card-hero {
     width: 100%;
     position: absolute;

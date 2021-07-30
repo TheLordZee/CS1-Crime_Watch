@@ -1,7 +1,7 @@
 const $jokeList = $(".jokes-list");
 const $followBtn = $(".follow-btn")
 const $reportList = $(".report-list")
-const BASE_URL = 'https://cs1-jokebook.herokuapp.com/'
+const BASE_URL = 'http://127.0.0.1:5000/'
 
 getCurrUser()
 
