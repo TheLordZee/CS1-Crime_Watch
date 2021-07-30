@@ -266,6 +266,16 @@ def edit_user_settings(u_id):
     
     return redirect('/')
 
+@app.route('/users/<int:u_id>/following')
+def show_following(u_id):
+    user = User.query.get(u_id)
+    return  render_template('users/following.html', user=user)
+
+@app.route('/users/<int:u_id>/followers')
+def show_followers(u_id):
+    user = User.query.get(u_id)
+    return  render_template('users/followers.html', user=user)
+
 """report route"""
 
 @app.route('/reports')
