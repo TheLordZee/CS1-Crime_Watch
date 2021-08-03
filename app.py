@@ -100,8 +100,9 @@ def signup():
                 created_at=datetime.now()
             )
             db.session.commit()
-        except IntegrityError:
+        except:
             flash("Username already taken", 'danger')
+            return redirect('/signup')
 
         do_login(user)
 
